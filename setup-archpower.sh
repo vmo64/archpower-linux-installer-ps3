@@ -227,7 +227,8 @@ install () {
         echo "Creating KBOOT bootloader entry"
         echo " "
 
-        printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:131 root=PARTUUID=%s initrd=/initramfs-linux-ps3.img"\n' "$PART_UUID" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry
+        #printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:131 root=PARTUUID=%s initrd=/initramfs-linux-ps3.img"\n' "$PART_UUID" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry
+        printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:131 root=%s initrd=/initramfs-linux-ps3.img"\n' "$PART2" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry (FIX FOR THE TIME BEING WHILE KERNEL IS BEING PATCHED AGAIN)
         sleep 1;
         #printf '[main]\ndhcp=dhclient\n' > /mnt/etc/NetworkManager/conf.d/dhcp-client.conf # Autoconfigure network on boot
         
