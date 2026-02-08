@@ -2,10 +2,10 @@
 Automatic installer script for the ArchPOWER Linux Distro on the PS3.
 
 ## How to use?
-1. You can use this script directly by running 
-``curl -o https://raw.githubusercontent.com/vmo64/archpower-linux-installer-ps3/main/setup-archpower.sh && bash setup-archpower.sh`` (GitHub Direct)
-or
-``curl -o http://ps3.christianresearchservice.com/archpower/dl/setup-archpower.sh && bash setup-archpower.sh`` (Mirror)
+1. You can use this script directly by running: <br>
+``curl -o https://raw.githubusercontent.com/vmo64/archpower-linux-installer-ps3/main/setup-archpower.sh && bash setup-archpower.sh`` (GitHub Direct) <br>
+or <br>
+``curl -o http://ps3.christianresearchservice.com/archpower/dl/setup-archpower.sh && bash setup-archpower.sh`` (Mirror) <br>
 3. You can boot straight off of the [ISO](http://ps3.christianresearchservice.com/archpower/dl/ARCH_202509.iso) modified to include this script (and it updates itself!).
 
 ## What can it do?
