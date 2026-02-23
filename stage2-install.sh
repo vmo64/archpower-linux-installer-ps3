@@ -1,4 +1,12 @@
 #!/bin/sh
+if ping -c 1 -W 2 google.com > /dev/null 2>&1; then
+    echo -e "[\e[32m OK \e[0m] Network (eth0) is UP, continuing."
+else
+    echo -e "[\e[31mERROR\e[0m] No internet connection, configuring internet connection."
+    dhclient
+    sleep 1;
+    # network configuration TODO
+fi
 
 install_lxde () {
     echo " "
@@ -49,7 +57,6 @@ else
     [ -n "$TZ_SET" ] && timedatectl set-timezone "$TZ_SET"
 fi
 
-
 # Keyboard selection
 KB=$(whiptail --title "Keyboard Layout" --menu "Select your keyboard layout:" 35 65 24 \
     "al" "Albanian" \
@@ -97,7 +104,6 @@ KB=$(whiptail --title "Keyboard Layout" --menu "Select your keyboard layout:" 35
     "us" "US English" 3>&1 1>&2 2>&3)
 
 [ -n "$KB" ] && localectl set-keymap "$KB"
-
 
 GUI_SELECT=$(whiptail --title "GUI Installation" --menu "Install Desktop Environment?" 12 45 2 \
     "1" "Yes, install LXDE" \
@@ -183,15 +189,25 @@ else
     echo "User cancelled or went back"
 fi
 
-ps3-video-mode -m $VIDEO_MODE
-mkdir /etc/system-manager
-echo $VIDEO_MODE > /etc/system-manager/video-mode.conf
+
+mkdir usr/local/bin/system-manager/conf
+echo $VIDEO_MODE > /usr/local/bin/system-manager/conf/video-mode.conf
 
 # Summary
 #whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || $([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None")" 15 60
 whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || ([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None"))" 15 60
 
 clear
+echo " "
+echo "###################################################"
+echo "Setting up ZRAM"
+echo "###################################################"
+echo " "
+
+echo -e '[zram0]\nzram-size = ram\nswap-priority = 100\ncompression-algorithm = zstd' | tee /etc/systemd/zram-generator.conf > /dev/null
+systemctl daemon-reload
+systemctl start dev-zram0.swap
+
 echo " "
 echo "###################################################"
 echo "Setting up ps3-utils"
@@ -234,8 +250,10 @@ then
     printf '%s\n' '#!/bin/bash' '' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' > ~/.bash_profile
 fi
 
+rm -rf /etc/systemd/system/getty@tty1.service.d/override.conf
+
+ps3-video-mode -m $VIDEO_MODE
 
 whiptail --title "Install Completed" --msgbox "=== ArchPOWER PS3 Install completed ===\n\nThe system will now restart. " 10 50
 sleep 1;
 reboot
-

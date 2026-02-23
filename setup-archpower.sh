@@ -167,6 +167,7 @@ install () {
         echo " "
         sleep 3;
         echo " "
+        read -p "Please enter your desired username: " -s USER_NAME
         read -p "Please enter the desired root user password: " -s USER_ROOT_PASS
         echo " "
 
@@ -183,7 +184,7 @@ install () {
         dd if=/dev/zero of=/mnt/swapfile bs=1M count=512
         chmod 0600 /mnt/swapfile
         mkswap /mnt/swapfile
-        swapon /mnt/swapfile
+        swapon -p 10 /mnt/swapfile
         sleep 1;
 
         clear
@@ -211,7 +212,7 @@ install () {
         sleep 2;
 
 
-        pacstrap -K /mnt base linux-ps3 wget nano vim sudo openssh iputils iproute2 dhclient net-tools htop neofetch sudo git autoconf automake libtool base-devel libnewt #networkmanager
+        pacstrap -K /mnt base linux-ps3 wget nano vim sudo openssh iputils iproute2 dhclient net-tools htop neofetch sudo git autoconf automake libtool base-devel libnewt zram-generator icewm #networkmanager
         
         genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -228,7 +229,7 @@ install () {
         echo " "
 
         #printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:131 root=PARTUUID=%s initrd=/initramfs-linux-ps3.img"\n' "$PART_UUID" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry
-        printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:131 root=%s initrd=/initramfs-linux-ps3.img"\n' "$PART2" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry (FIX FOR THE TIME BEING WHILE KERNEL IS BEING PATCHED AGAIN)
+        printf 'timeout=100\ndefault=ArchPower\nArchPower="/vmlinuz-linux-ps3 arch=ppc64 quiet loglevel=N video=ps3fb:mode:0 root=%s initrd=/initramfs-linux-ps3.img"\n' "$PART2" > /mnt/boot/kboot.conf # Configure Kboot/PetitBoot Entry (FIX FOR THE TIME BEING WHILE KERNEL IS BEING PATCHED AGAIN)
         sleep 1;
         #printf '[main]\ndhcp=dhclient\n' > /mnt/etc/NetworkManager/conf.d/dhcp-client.conf # Autoconfigure network on boot
         
@@ -254,21 +255,13 @@ install () {
         arch-chroot /mnt /bin/bash -c "ln -sf ../systemd-timesyncd.service /etc/systemd/system/multi-user.target.wants/"
 
         echo " "
-        echo "Setting up SSH root user login"
+        echo "Setting up user accounts"
         echo " "
-
+        
+        arch-chroot /mnt /bin/bash -c "useradd -m -G wheel -s /bin/bash $USER_NAME"
         arch-chroot /mnt /bin/bash -c "sed -i 's/^#\s*PermitRootLogin\s\+prohibit-password\s*$/PermitRootLogin yes/;s/^#\s*PermitRootLogin\s\+without-password\s*$/PermitRootLogin yes/' /etc/ssh/sshd_config" # Enable root user login via SSH
-        
-        echo " "
-        echo "Setting up root user autologin"
-        echo " "
-
         arch-chroot /mnt sh -c "mkdir -p /etc/systemd/system/getty@tty1.service.d && echo -e '[Service]\nExecStart=\nExecStart=-/usr/bin/agetty --autologin root --noclear %I $TERM' | tee /etc/systemd/system/getty@tty1.service.d/override.conf > /dev/null" # Enable autologin for first time
-        
-        echo " "
-        echo "Setting up root user password"
-        echo " "
-        
+        arch-chroot /mnt sh -c "echo $USER_NAME':'$USER_ROOT_PASS | chpasswd" # Change ROOT user password
         arch-chroot /mnt sh -c "echo 'root:'$USER_ROOT_PASS | chpasswd" # Change ROOT user password
         
         echo " "
@@ -289,10 +282,10 @@ install () {
         echo " "
         echo "###################################################"
         echo -e "\e[31mPlease remove your installation media after the system restarts.\e[0m"
-        echo "System is rebooting in 10 seconds."
+        echo "System is rebooting in 5 seconds."
         echo "###################################################"
         echo " "
-        sleep 10; 
+        sleep 5; 
         reboot
 
 
@@ -308,7 +301,7 @@ menu () {
     echo " "
     echo "###################################################"
     echo -e "\e[96mArchPOWER\e[0m PS3 Linux Installer by ajww, gypsy & vmo64"
-    echo "Version 0.2 - 03.02.2026."
+    echo "Version 0.3 - 23.02.2026."
     echo "###################################################"
     sleep 1;
     echo " "

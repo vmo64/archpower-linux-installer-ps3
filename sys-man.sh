@@ -4,6 +4,8 @@
 # Built by ajww, gypsy & vmo64 (NGX)
 # Disabling this script will cause system instability!
 
+# Version 0.3 - 23.02.2026.
+
 
 
 # Configure network IP
@@ -13,7 +15,11 @@ systemctl restart systemd-timesyncd
 
 # Enable RSX VRAM to be used as high-speed SWAP
 mkswap /dev/ps3vram
-swapon /dev/ps3vram 
+sudo swapon -p 50 /dev/ps3vram
+
+# Video mode config
+VIDEO_MODE=$(cat "/usr/local/bin/system-manager/conf/video-mode.conf")
+ps3-video-mode -m $VIDEO_MODE
 
 # Create symlinks to reroute ps3-util names to traditional names
 ln -sf /dev/ps3vflashf /dev/ps3flash
