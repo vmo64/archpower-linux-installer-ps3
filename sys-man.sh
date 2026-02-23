@@ -15,7 +15,7 @@ systemctl restart systemd-timesyncd
 
 # Enable RSX VRAM to be used as high-speed SWAP
 mkswap /dev/ps3vram
-sudo swapon -p 50 /dev/ps3vram
+swapon -p 50 /dev/ps3vram
 
 # Video mode config
 VIDEO_MODE=$(cat "/usr/local/bin/system-manager/conf/video-mode.conf")
