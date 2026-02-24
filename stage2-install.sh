@@ -197,7 +197,7 @@ echo $VIDEO_MODE > /etc/system-manager/video-mode.conf
 
 # Summary
 #whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || $([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None")" 15 60
-whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || ([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None"))" 15 60
+whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXQt" || ([ "$GUI_SELECT" = "2" ] && echo "LXDE" || echo "None"))" 15 60
 
 clear
 echo " "
