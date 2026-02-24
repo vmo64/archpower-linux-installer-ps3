@@ -15,8 +15,9 @@ install_lxde () {
     echo "###################################################"
 
     pacman -Sy --noconfirm lxde xf86-video-fbdev lxde-icon-theme xorg-server xorg-xinit xterm noto-fonts ttf-dejavu lxde-common lxappearance xorg-xclock # Works but also doesn't?? Icons and backgrounds are broken, WIP..
-    echo -e 'exec startlxde' > /root/.xinitrc
-    printf '%s\n' '#!/bin/bash' '' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '    echo "X is running"' 'else' '    echo ""' '    echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '    echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '    echo ""' '    sleep 5' '    echo "Starting X server with LXDE..."' '    exec startx' 'fi' > ~/.bash_profile
+    echo -e 'exec startlxde' > /etc/X11/xinit/xinitrc
+    rm -rf /root/.bash_profile
+    printf '%s\n' '#!/bin/bash' '' 'SESSION_TYPE=$(loginctl show-session $XDG_SESSION_ID -p Type --value)' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if [ "$SESSION_TYPE" == "tty" ]; then' '    if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '        echo "Xorg is running"' '    else' '        echo ""' '        echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '        echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '        echo ""' '        sleep 5' '        echo "Starting Xorg server with LXDE..."' '        exec startx' '    fi' 'fi' > /etc/profile.d/bash_profile.sh
 }
 
 install_lxqt () {
@@ -25,9 +26,10 @@ install_lxqt () {
     echo "Setting up LXQt"
     echo "###################################################"
 
-    pacman -Sy --noconfirm lxqt xf86-video-fbdev xorg-server xorg-xinit xterm noto-fonts ttf-dejavu xorg-xclock breeze-icons # Works but also doesn't?? Icons and backgrounds are broken, WIP..
-    echo -e 'exec startlxqt' > /root/.xinitrc
-    printf '%s\n' '#!/bin/bash' '' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '    echo "X is running"' 'else' '    echo ""' '    echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '    echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '    echo ""' '    sleep 5' '    echo "Starting X server with LXQt..."' '    exec startx' 'fi' > ~/.bash_profile
+    pacman -Sy --noconfirm lxqt xf86-video-fbdev xorg-server xorg-xinit xterm noto-fonts ttf-dejavu xorg-xclock breeze-icons # Works 
+    echo -e 'exec startlxqt' > /etc/X11/xinit/xinitrc
+    rm -rf /root/.bash_profile
+    printf '%s\n' '#!/bin/bash' '' 'SESSION_TYPE=$(loginctl show-session $XDG_SESSION_ID -p Type --value)' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if [ "$SESSION_TYPE" == "tty" ]; then' '    if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '        echo "Xorg is running"' '    else' '        echo ""' '        echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '        echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '        echo ""' '        sleep 5' '        echo "Starting Xorg server with LXQt..."' '        exec startx' '    fi' 'fi' > /etc/profile.d/bash_profile.sh
 }
 
 
@@ -105,9 +107,9 @@ KB=$(whiptail --title "Keyboard Layout" --menu "Select your keyboard layout:" 35
 
 [ -n "$KB" ] && localectl set-keymap "$KB"
 
-GUI_SELECT=$(whiptail --title "GUI Installation" --menu "Install Desktop Environment?" 12 45 2 \
-    "1" "Yes, install LXDE" \
-    "2" "Yes, install LXQt" \
+GUI_SELECT=$(whiptail --title "GUI Installation" --menu "Install Desktop Environment?" 12 65 2 \
+    "1" "Yes, install LXQt (recommended)" \
+    "2" "Yes, install LXDE" \
     "3" "No, skip GUI installation" 3>&1 1>&2 2>&3)
 
 export GUI_SELECT
@@ -190,8 +192,8 @@ else
 fi
 
 
-mkdir usr/local/bin/system-manager/conf
-echo $VIDEO_MODE > /usr/local/bin/system-manager/conf/video-mode.conf
+mkdir /etc/system-manager
+echo $VIDEO_MODE > /etc/system-manager/video-mode.conf
 
 # Summary
 #whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || $([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None")" 15 60
@@ -214,7 +216,6 @@ echo "Setting up ps3-utils"
 echo "###################################################"
 echo " "
 
-pacman -S --needed base-devel git autoconf automake libtool 
 cd /tmp/
 git clone https://kernel.googlesource.com/pub/scm/linux/kernel/git/geoff/ps3-utils
 cd /tmp/ps3-utils
@@ -228,26 +229,26 @@ echo 'KERNEL=="ps3flashf", SYMLINK+="ps3flash"' | tee /etc/udev/rules.d/99-ps3fl
 
 # Update system-manager service
 systemctl stop system-manager
-rm /usr/local/bin/system-manager/sys-man.sh
-curl -o /usr/local/bin/system-manager/sys-man.sh http://ps3.christianresearchservice.com/archpower/dl/sys-man.sh
+mv /usr/local/bin/system-manager/sys-man /usr/local/bin/system-manager/sys-man.bak
+curl -o /usr/local/bin/system-manager/sys-man http://ps3.christianresearchservice.com/archpower/dl/sys-man.sh
 curl -o /usr/local/bin/system-manager/updater.sh http://ps3.christianresearchservice.com/archpower/dl/updater.sh
-chmod +x /usr/local/bin/system-manager/sys-man.sh
+chmod +x /usr/local/bin/system-manager/sys-man
 chmod +x /usr/local/bin/system-manager/updater.sh
 
-
-if [[ $GUI_SELECT = "1" ]]
-then
-    install_lxde
-fi
 
 if [[ $GUI_SELECT = "1" ]]
 then
     install_lxqt
 fi
 
+if [[ $GUI_SELECT = "2" ]]
+then
+    install_lxde
+fi
+
 if [[ $GUI_SELECT = "3" ]]
 then
-    printf '%s\n' '#!/bin/bash' '' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' > ~/.bash_profile
+    printf '%s\n' '#!/bin/bash' '' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' > /etc/profile.d/bash_profile.sh
 fi
 
 rm -rf /etc/systemd/system/getty@tty1.service.d/override.conf

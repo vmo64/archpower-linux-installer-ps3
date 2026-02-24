@@ -57,9 +57,9 @@ install () {
         echo "Creating HDD Partitions"
         echo "###################################################"
         echo -e "Warning: This operation will \e[31mPERMANENTALLY DELETE\e[0m all data fom the selected volume!!"
-        echo "Starting in 10 seconds, press CTRL+C to abort!"
+        echo "Starting in 5 seconds, press CTRL+C to abort!"
         echo "###################################################"
-        sleep 10;
+        sleep 5;
         echo " "
         echo " "
         echo " "
@@ -112,9 +112,9 @@ install () {
         echo " "
         echo "###################################################"
         echo -e "Warning: This operation will \e[31mPERMANENTALLY DELETE\e[0m all data fom the selected volume!!"
-        echo "Starting in 10 seconds, press CTRL+C to abort!"
+        echo "Starting in 5 seconds, press CTRL+C to abort!"
         echo "###################################################"
-        sleep 10;
+        sleep 5;
         echo " "
         echo " "
         echo " "
@@ -167,7 +167,8 @@ install () {
         echo " "
         sleep 3;
         echo " "
-        read -p "Please enter your desired username: " -s USER_NAME
+        read -p "Please enter your desired username: " USER_NAME
+        echo " ";
         read -p "Please enter the desired root user password: " -s USER_ROOT_PASS
         echo " "
 
@@ -211,8 +212,13 @@ install () {
         echo " "
         sleep 2;
 
+        sed -i 's/^SigLevel\s*=\s*Required DatabaseOptional$/SigLevel    = Never/' /etc/pacman.conf # Disable GPG Check in Pacman as root key is invalid
+        pacman-key --recv-keys D201F92AE42528456537C3F9B96775F34689694C
+        echo 'D201F92AE42528456537C3F9B96775F34689694C:4:' >>/usr/share/pacman/keyrings/archpower-trusted
+        pacman-key --populate archpower
+        pacman -Sy archpower-keyring
 
-        pacstrap -K /mnt base linux-ps3 wget nano vim sudo openssh iputils iproute2 dhclient net-tools htop neofetch sudo git autoconf automake libtool base-devel libnewt zram-generator icewm #networkmanager
+        pacstrap -K /mnt base linux-ps3 wget nano vim openssh iputils iproute2 dhclient net-tools htop neofetch sudo git autoconf automake libtool base-devel libnewt zram-generator icewm #networkmanager
         
         genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -237,20 +243,20 @@ install () {
         echo "Disabling GPG check in Pacman (needed for ArchPOWER repo)"
         echo " "
 
-        sudo sed -i 's/^SigLevel\s*=\s*Required DatabaseOptional$/SigLevel    = Never/' /etc/pacman.conf # Disable GPG Check in Pacman as root key is invalid
+        #sed -i 's/^SigLevel\s*=\s*Required DatabaseOptional$/SigLevel    = Never/' /etc/pacman.conf # Disable GPG Check in Pacman as root key is invalid
 
         echo " "
         echo "Configuring and installing system-manager service"
         echo " "
 
         mkdir /mnt/usr/local/bin/system-manager
-        curl -o /mnt/usr/local/bin/system-manager/sys-man.sh http://ps3.christianresearchservice.com/archpower/dl/sys-man.sh # Download latest system-manager script
+        curl -o /mnt/usr/local/bin/system-manager/sys-man http://ps3.christianresearchservice.com/archpower/dl/sys-man.sh # Download latest system-manager script
         curl -o /mnt/usr/local/bin/system-manager/stage2-install.sh http://ps3.christianresearchservice.com/archpower/dl/stage2-install.sh # Download latest stage2-install script
         curl -o /mnt/usr/local/bin/system-manager/updater.sh http://ps3.christianresearchservice.com/archpower/dl/updater.sh # Download latest system-manager updater script
         arch-chroot /mnt /bin/bash -c "chmod +x /usr/local/bin/system-manager/stage2-install.sh"
-        arch-chroot /mnt /bin/bash -c "chmod +x /usr/local/bin/system-manager/sys-man.sh"
+        arch-chroot /mnt /bin/bash -c "chmod +x /usr/local/bin/system-manager/sys-man"
         arch-chroot /mnt /bin/bash -c "chmod +x /usr/local/bin/system-manager/updater.sh"
-        echo -e '[Unit]\nAfter=sysinit.target\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/system-manager/sys-man.sh\n\n[Install]\nWantedBy=multi-user.target' > /mnt/etc/systemd/system/system-manager.service #Install the system-manager service
+        echo -e '[Unit]\nAfter=sysinit.target\n\n[Service]\nType=oneshot\nExecStart=/usr/local/bin/system-manager/sys-man autostart\n\n[Install]\nWantedBy=multi-user.target' > /mnt/etc/systemd/system/system-manager.service #Install the system-manager service
         arch-chroot /mnt /bin/bash -c "ln -sf ../system-manager.service /etc/systemd/system/multi-user.target.wants/"
         arch-chroot /mnt /bin/bash -c "ln -sf ../systemd-timesyncd.service /etc/systemd/system/multi-user.target.wants/"
 
@@ -263,6 +269,7 @@ install () {
         arch-chroot /mnt sh -c "mkdir -p /etc/systemd/system/getty@tty1.service.d && echo -e '[Service]\nExecStart=\nExecStart=-/usr/bin/agetty --autologin root --noclear %I $TERM' | tee /etc/systemd/system/getty@tty1.service.d/override.conf > /dev/null" # Enable autologin for first time
         arch-chroot /mnt sh -c "echo $USER_NAME':'$USER_ROOT_PASS | chpasswd" # Change ROOT user password
         arch-chroot /mnt sh -c "echo 'root:'$USER_ROOT_PASS | chpasswd" # Change ROOT user password
+        arch-chroot /mnt sh -c "sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers" # Enable SUDO for users
         
         echo " "
         echo "Configuring stage2 installer"
@@ -301,7 +308,7 @@ menu () {
     echo " "
     echo "###################################################"
     echo -e "\e[96mArchPOWER\e[0m PS3 Linux Installer by ajww, gypsy & vmo64"
-    echo "Version 0.3 - 23.02.2026."
+    echo "Version 0.4 - 24.02.2026."
     echo "###################################################"
     sleep 1;
     echo " "
