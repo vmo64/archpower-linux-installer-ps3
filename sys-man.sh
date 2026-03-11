@@ -33,8 +33,8 @@ if [ "$1" == "autostart" ]; then
     ps3-video-mode -m $VIDEO_MODE
 
     # Make agresssive swap scheme
-    sysctl vm.swappiness=100
-    sysctl vm.vfs_cache_pressure=110 
+    sysctl vm.swappiness=60
+    sysctl vm.vfs_cache_pressure=100
     sysctl vm.min_free_kbytes=8192 # Do not fill the last 8MiB of RAM
     sysctl vm.watermark_scale_factor=10
 
