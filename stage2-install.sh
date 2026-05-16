@@ -14,7 +14,7 @@ install_lxde () {
     echo "Setting up LXDE"
     echo "###################################################"
 
-    pacman -Sy --noconfirm lxde xf86-video-fbdev lxde-icon-theme xorg-server xorg-xinit xterm noto-fonts ttf-dejavu lxde-common lxappearance xorg-xclock # Works but also doesn't?? Icons and backgrounds are broken, WIP..
+    pacman -Sy --noconfirm --disable-sandbox lxde xf86-video-fbdev lxde-icon-theme xorg-server xorg-xinit xterm noto-fonts ttf-dejavu lxde-common lxappearance xorg-xclock # Works but also doesn't?? Icons and backgrounds are broken, WIP..
     echo -e 'exec startlxde' > /etc/X11/xinit/xinitrc
     rm -rf /root/.bash_profile
     printf '%s\n' '#!/bin/bash' '' 'SESSION_TYPE=$(loginctl show-session $XDG_SESSION_ID -p Type --value)' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if [ "$SESSION_TYPE" == "tty" ]; then' '    if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '        echo "Xorg is running"' '    else' '        echo ""' '        echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '        echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '        echo ""' '        sleep 5' '        echo "Starting Xorg server with LXDE..."' '        exec startx' '    fi' 'fi' > /etc/profile.d/bash_profile.sh
@@ -26,7 +26,7 @@ install_lxqt () {
     echo "Setting up LXQt"
     echo "###################################################"
 
-    pacman -Sy --noconfirm lxqt xf86-video-fbdev xorg-server xorg-xinit xterm noto-fonts ttf-dejavu xorg-xclock breeze-icons # Works 
+    pacman -Sy --noconfirm --disable-sandbox lxqt xf86-video-fbdev xorg-server xorg-xinit xterm noto-fonts ttf-dejavu xorg-xclock breeze-icons # Works
     echo -e 'exec startlxqt' > /etc/X11/xinit/xinitrc
     rm -rf /root/.bash_profile
     printf '%s\n' '#!/bin/bash' '' 'SESSION_TYPE=$(loginctl show-session $XDG_SESSION_ID -p Type --value)' 'echo ""' 'echo -e "Welcome to \e[96mArchPOWER PS3 Linux\e[0m, $(whoami)!"' 'echo ""' 'echo -e "System load:\e[32m $(cat /proc/loadavg | cut -d" " -f1-3)\e[0m"' 'echo -e "IP address:\e[32m $(ip -4 -o addr show scope global | awk '\''{print $4}'\'' | cut -d/ -f1 | head -1 || echo "Not connected")\e[0m"' 'echo -e "Free system storage:\e[32m $(df -h / | awk '\''NR==2 {print $4}'\'')\e[0m"' 'echo ""' 'if [ "$SESSION_TYPE" == "tty" ]; then' '    if pgrep -x "Xorg" >/dev/null || pgrep -x "X" >/dev/null; then' '        echo "Xorg is running"' '    else' '        echo ""' '        echo -e "\e[33mStarting X in 5 seconds...\e[0m"' '        echo -e "\e[33mPress CTRL+C to continue in CLI.\e[0m"' '        echo ""' '        sleep 5' '        echo "Starting Xorg server with LXQt..."' '        exec startx' '    fi' 'fi' > /etc/profile.d/bash_profile.sh
@@ -196,8 +196,8 @@ mkdir /etc/system-manager
 echo $VIDEO_MODE > /etc/system-manager/video-mode.conf
 
 # Summary
-#whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || $([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None")" 15 60
-whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXQt" || ([ "$GUI_SELECT" = "2" ] && echo "LXDE" || echo "None"))" 15 60
+#whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXQt" || $([ "$GUI_SELECT" = "2" ] && echo "LXDE" || echo "None")" 15 60
+whiptail --title "System Configuration Complete" --msgbox "Configuration finished!\n\n• Timezone: ${TZ_SET:-Not set}\n• Keyboard: ${KB:-Not set}\n• Video Mode: ${VIDEO_MODE:-Not set}\n• GUI: $([ "$GUI_SELECT" = "1" ] && echo "LXDE" || ([ "$GUI_SELECT" = "2" ] && echo "LXQt" || echo "None"))" 15 60
 
 clear
 echo " "
