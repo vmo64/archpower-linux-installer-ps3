@@ -213,6 +213,7 @@ install () {
         sleep 2;
 
         sed -i 's/^SigLevel\s*=\s*Required DatabaseOptional$/SigLevel    = Never/' /etc/pacman.conf # Disable GPG Check in Pacman as root key is invalid
+        sudo sed -i '/^\[options\]/a DisableSandboxFilesystem' /etc/pacman.conf # Fix sandbox bug
         pacman-key --recv-keys D201F92AE42528456537C3F9B96775F34689694C
         echo 'D201F92AE42528456537C3F9B96775F34689694C:4:' >>/usr/share/pacman/keyrings/archpower-trusted
         pacman-key --populate archpower
